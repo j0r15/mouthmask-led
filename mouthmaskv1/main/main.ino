@@ -1,7 +1,7 @@
 #include <WS2812FX.h>
 
-#define LED_COUNT 13
-#define LED_PIN 11
+#define LED_COUNT 7
+#define LED_PIN D2
 
 #define TIMER_MS 5000
 
