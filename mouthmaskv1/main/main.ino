@@ -1,9 +1,12 @@
 #include <WS2812FX.h>
 
-#define LED_COUNT 7
+#define LED_COUNT 150
 #define LED_PIN D2
 
-#define TIMER_MS 5000
+#define ANALOG_PIN A0
+#define ANALOG_THRESHOLD 512
+
+#define TIMER_MS 3000
 
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = Arduino pin number (most are valid)
@@ -15,16 +18,13 @@
 //   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 WS2812FX ws2812fx = WS2812FX(LED_COUNT, LED_PIN, NEO_RGB + NEO_KHZ800);
 
-unsigned long last_change = 0;
+unsigned long last_trigger = 0;
 unsigned long now = 0;
 
 void setup() {
   ws2812fx.init();
   ws2812fx.setBrightness(255);
-  ws2812fx.setSpeed(1000);
-  ws2812fx.setColor(0x007BFF);
-  ws2812fx.setMode(FX_MODE_STATIC);
-  ws2812fx.start();
+  ws2812fx.setMode(FX_MODE_RANDOM_COLOR);
 }
 
 void loop() {
@@ -32,8 +32,15 @@ void loop() {
 
   ws2812fx.service();
 
-  if(now - last_change > TIMER_MS) {
-    ws2812fx.setMode((ws2812fx.getMode() + 1) % ws2812fx.getModeCount());
-    last_change = now;
+  // trigger on a regular basis
+  if(now - last_trigger > TIMER_MS) {
+    ws2812fx.trigger();
+    last_trigger = now;
+  }
+
+  // trigger, if analog value is above threshold
+  // this comes in handy, when using a microphone on analog input
+  if(analogRead(ANALOG_PIN) > ANALOG_THRESHOLD) {
+    ws2812fx.trigger();
   }
 }
