@@ -1,10 +1,10 @@
 #include <WS2812FX.h>
 
-#define LED_COUNT 150
-#define LED_PIN D2
+#define LED_COUNT 7
+#define LED_PIN D3
 
-#define ANALOG_PIN A0
-#define ANALOG_THRESHOLD 512
+#define SENSOR_PIN D0
+// #define ANALOG_THRESHOLD 512
 
 #define TIMER_MS 3000
 
@@ -24,23 +24,25 @@ unsigned long now = 0;
 void setup() {
   ws2812fx.init();
   ws2812fx.setBrightness(255);
-  ws2812fx.setMode(FX_MODE_RANDOM_COLOR);
+  ws2812fx.setMode(FX_MODE_RAINBOW_CYCLE);
 }
 
 void loop() {
   now = millis();
-
   ws2812fx.service();
 
   // trigger on a regular basis
-  if(now - last_trigger > TIMER_MS) {
-    ws2812fx.trigger();
-    last_trigger = now;
-  }
+  // if(now - last_trigger > TIMER_MS) {
+  //   ws2812fx.trigger();
+  //   last_trigger = now;
+  // }
 
   // trigger, if analog value is above threshold
   // this comes in handy, when using a microphone on analog input
-  if(analogRead(ANALOG_PIN) > ANALOG_THRESHOLD) {
+  if(digitalRead(SENSOR_PIN) > 0) {
     ws2812fx.trigger();
+    ws2812fx.setBrightness(255);
+  } else {
+    ws2812fx.setBrightness(10);
   }
 }
